@@ -14,7 +14,6 @@ const app = (0, express_1.default)();
 const port = 3000;
 //ユーザー情報
 const users = [];
-users.push({ id: 1, username: "dummy", password: "dummy" });
 //ユーザーID(作成するたびにインクリメント)
 let currentId = 1;
 app.use(body_parser_1.default.urlencoded({
@@ -51,19 +50,21 @@ app.post("/user", auth_1.authenticateToken, (req, res) => {
     res.json(newUser);
 });
 //ユーザー情報の削除
-app.delete("/user/{id}", auth_1.authenticateToken, (req, res) => {
-    res.json({ message: "成功" });
-    // const userId = Number(req.params.id);
-    // console.log('userId==', userId);
-    // //バリデーション
-    // if (userId === undefined) {
-    //   res.status(400).json({ error: "idは必須です" });
-    // }
-    // if (users[userId] === undefined) {
-    //   res.status(404).json({ error: "ユーザーが存在しません" });
-    // }
-    // users.splice(userId, 1);
-    // res.json({ message: `ユーザーid${userId}を削除しました` });
+app.delete("/user/:id", auth_1.authenticateToken, (req, res) => {
+    const userId = Number(req.params.id);
+    //userIdに該当するユーザーのindexを取得
+    const index = users.findIndex(user => user.id === userId);
+    //バリデーション
+    if (userId === undefined) {
+        res.status(400).json({ error: "idは必須です" });
+        return;
+    }
+    if (index === -1) {
+        res.status(404).json({ error: "ユーザーが存在しません" });
+        return;
+    }
+    users.splice(index, 1);
+    res.json({ message: `ユーザーid${userId}を削除しました` });
 });
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

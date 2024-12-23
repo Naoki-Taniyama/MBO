@@ -18,7 +18,6 @@ type userType = {
 
 //ユーザー情報
 const users: userType[] = [];
-users.push({ id: 1, username: "dummy", password: "dummy" });
 //ユーザーID(作成するたびにインクリメント)
 let currentId = 1;
 app.use(
@@ -62,20 +61,22 @@ app.post("/user", authenticateToken, (req, res) => {
 });
 
 //ユーザー情報の削除
-app.delete("/user/{id}", authenticateToken, (req, res) => {
-  res.json({ message: "成功" });
-  // const userId = Number(req.params.id);
-  // console.log('userId==', userId);
+app.delete("/user/:id", authenticateToken, (req, res) => {
+  const userId = Number(req.params.id);
+  //userIdに該当するユーザーのindexを取得
+  const index = users.findIndex(user => user.id === userId);
 
-  // //バリデーション
-  // if (userId === undefined) {
-  //   res.status(400).json({ error: "idは必須です" });
-  // }
-  // if (users[userId] === undefined) {
-  //   res.status(404).json({ error: "ユーザーが存在しません" });
-  // }
-  // users.splice(userId, 1);
-  // res.json({ message: `ユーザーid${userId}を削除しました` });
+  //バリデーション
+  if (userId === undefined) {
+    res.status(400).json({ error: "idは必須です" });
+    return;
+  }
+  if (index === -1) {
+    res.status(404).json({ error: "ユーザーが存在しません" });
+    return;
+  }
+  users.splice(index, 1);
+  res.json({ message: `ユーザーid${userId}を削除しました` });
 });
 
 app.listen(port, () => {
