@@ -10,113 +10,140 @@ paths:
   /users:
     parameters: []
     get:
-      summary: Get User Info by User ID
+      summary: ユーザー一覧取得API
       tags: []
       responses:
         '200':
-          description: User Found
+          description: OK
           content:
             application/json:
               schema:
                 type: array
-                items: {}
-        '404':
-          description: User Not Found
+                items:
+                  x-stoplight:
+                    id: gflnmjypz6w6z
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      x-stoplight:
+                        id: 4glenl950x97x
+                      description: id
+                    username:
+                      type: string
+                      x-stoplight:
+                        id: w5ul9uk3nh178
+                      description: ユーザーネーム
+                    password:
+                      type: string
+                      x-stoplight:
+                        id: fmuzxc2lc3uys
+                      description: パスワード
+                  required:
+                    - id
+                    - username
+                    - password
+              examples: {}
       operationId: get-users-userId
-      description: ユーザー一覧を取得
-  /user:
-    post:
-      summary: Create New User
-      operationId: post-user
+      description: ユーザー一覧を取得するAPI
+  /login:
+    get:
+      summary: アクセストークン発行API
+      tags: []
       responses:
         '200':
-          description: User Created
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-              examples:
-                New User Bob Fellow:
-                  value:
-                    id: 12
-                    firstName: Bob
-                    lastName: Fellow
-                    email: bob.fellow@gmail.com
-                    dateOfBirth: '1996-08-24'
-                    emailVerified: false
-                    createDate: '2020-11-18'
+                type: object
+                properties:
+                  token:
+                    type: string
+                    x-stoplight:
+                      id: ol5xoxxw1e8rn
+                    description: トークン
+        '500':
+          description: ''
+          content: {}
+      operationId: get-login
+      description: アクセストークンを発行するAPI
+  '/user/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    delete:
+      summary: ユーザー情報削除API
+      operationId: delete-user-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    x-stoplight:
+                      id: x1sqxa46087cq
+                    description: id
+                  username:
+                    type: string
+                    x-stoplight:
+                      id: 1ftmqnj35s6hf
+                    description: username
+                  password:
+                    type: string
+                    x-stoplight:
+                      id: j49zlra6e5ynz
+                    description: password
+                required:
+                  - id
+                  - username
+                  - password
         '400':
-          description: Missing Required Information
-        '409':
-          description: Email Already Taken
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                firstName:
-                  type: string
-                lastName:
-                  type: string
-                email:
-                  type: string
-                dateOfBirth:
-                  type: string
-                  format: date
-              required:
-                - firstName
-                - lastName
-                - email
-                - dateOfBirth
-            examples:
-              Create User Bob Fellow:
-                value:
-                  firstName: Bob
-                  lastName: Fellow
-                  email: bob.fellow@gmail.com
-                  dateOfBirth: '1996-08-24'
-        description: Post the necessary fields for the API to create a new user.
-      description: Create a new user.
+          description: ''
+        '404':
+          description: ''
+      description: ユーザー情報を削除するAPI
+  /user:
+    post:
+      summary: ユーザー情報登録API
+      operationId: post-user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    x-stoplight:
+                      id: 2pqvpdo9avlms
+                  username:
+                    type: string
+                    x-stoplight:
+                      id: 3j4ndaowvbf53
+                  password:
+                    type: string
+                    x-stoplight:
+                      id: wgpa28cvml38n
+                required:
+                  - id
+                  - username
+                  - password
+        '400':
+          description: ''
+        '401':
+          description: ''
+        '500':
+          description: ''
+      description: ユーザー情報を登録するAPI
 components:
-  schemas:
-    User:
-      title: User
-      type: object
-      description: ''
-      examples:
-        - id: 142
-          firstName: Alice
-          lastName: Smith
-          email: alice.smith@gmail.com
-          dateOfBirth: '1997-10-31'
-          emailVerified: true
-          signUpDate: '2019-08-24'
-      properties:
-        id:
-          type: integer
-          description: Unique identifier for the given user.
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-          format: email
-        dateOfBirth:
-          type: string
-          format: date
-          example: '1997-10-31'
-        emailVerified:
-          type: boolean
-          description: Set to true if the user's email has been verified.
-        createDate:
-          type: string
-          format: date
-          description: The date that the user was created.
-      required:
-        - id
-        - firstName
-        - lastName
-        - email
-        - emailVerified
+  schemas: {}
