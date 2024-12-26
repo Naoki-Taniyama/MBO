@@ -3,25 +3,16 @@ import { authenticateToken } from "./middleware/auth";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import  mysql  from "mysql2";
+import { createTable, getUsers, insertUser } from "./dbControll";
 
-const connection = mysql.createPool({
-  host: '127.0.0.1',
-  user: 'root',
-  password: 'root',
-  database: 'users'
-});
+const testUser: userType = {
+  id: 2,
+  username: "testusername1",
+  password: "testpassword1",
+};
 
-// 非同期使いたいのでasync関数を作成
-const main = async () => {
-  connection.query('drop table tab_a')
-  connection.query('create table tab_a(col1 integer)')
-  connection.query('insert into tab_a(col1) values(1)')
-  //結果を取得したい
-  const [rows] = await connection.promise().query('SELECT * FROM tab_a');
-  console.dir(rows);
-}
-main();
+createTable();
+console.dir();
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -32,7 +23,7 @@ type userType = {
   id: number;
   username: string;
   password: string;
-}
+};
 
 //ユーザー情報
 const users: userType[] = [];
@@ -66,23 +57,22 @@ app.post("/login", (req: Request, res: Response, next: NextFunction) => {
 
 //ユーザー情報の取得
 app.get("/users", (req, res) => {
+  const users = getUsers();
   res.json(users);
 });
 
 //ユーザー情報の登録
 app.post("/user", authenticateToken, (req, res) => {
-    const { username, password } = req.body;
-    const newUser = { id: currentId++, username, password };
-    users.push(newUser);
-    res.json(newUser);
-
+  const { username, password } = req.body;
+  insertUser(username, password);
+  res.json({message: "ユーザーを登録しました"});
 });
 
 //ユーザー情報の削除
 app.delete("/user/:id", authenticateToken, (req, res) => {
   const userId = Number(req.params.id);
   //userIdに該当するユーザーのindexを取得
-  const index = users.findIndex(user => user.id === userId);
+  const index = users.findIndex((user) => user.id === userId);
 
   //バリデーション
   if (userId === undefined) {
