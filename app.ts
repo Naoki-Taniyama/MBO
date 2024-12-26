@@ -3,7 +3,22 @@ import { authenticateToken } from "./middleware/auth";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
+import  mysql  from "mysql";
 
+const connection = mysql.createConnection({
+  host: '127.0.0.1',
+  user: 'root',
+  password: 'root',
+  database: 'users'
+});
+
+connection.connect()
+connection.query('create table tab_a(col1 integer)')
+connection.query('insert into tab_a(col1) values(1)')
+connection.query('SELECT * FROM tab_a', (err, rows, fields) => {
+  if (err) throw err
+  console.log('The solution is: ', rows[0]);
+})
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 

@@ -8,6 +8,21 @@ const auth_1 = require("./middleware/auth");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const mysql_1 = __importDefault(require("mysql"));
+const connection = mysql_1.default.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'root',
+    database: 'users'
+});
+connection.connect();
+connection.query('create table tab_a(col1 integer)');
+connection.query('insert into tab_a(col1) values(1)');
+connection.query('SELECT * FROM tab_a', (err, rows, fields) => {
+    if (err)
+        throw err;
+    console.log('The solution is: ', rows[0]);
+});
 dotenv_1.default.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 const app = (0, express_1.default)();
