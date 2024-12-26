@@ -8,21 +8,23 @@ const auth_1 = require("./middleware/auth");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const mysql_1 = __importDefault(require("mysql"));
-const connection = mysql_1.default.createConnection({
+const mysql2_1 = __importDefault(require("mysql2"));
+const connection = mysql2_1.default.createPool({
     host: '127.0.0.1',
     user: 'root',
     password: 'root',
     database: 'users'
 });
-connection.connect();
-connection.query('create table tab_a(col1 integer)');
-connection.query('insert into tab_a(col1) values(1)');
-connection.query('SELECT * FROM tab_a', (err, rows, fields) => {
-    if (err)
-        throw err;
-    console.log('The solution is: ', rows[0]);
-});
+// 非同期使いたいのでasync関数を作成
+const main = async () => {
+    connection.query('drop table tab_a');
+    connection.query('create table tab_a(col1 integer)');
+    connection.query('insert into tab_a(col1) values(1)');
+    //結果を取得したい
+    const [rows] = await connection.promise().query('SELECT * FROM tab_a');
+    console.dir(rows);
+};
+main();
 dotenv_1.default.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 const app = (0, express_1.default)();

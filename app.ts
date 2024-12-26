@@ -3,22 +3,25 @@ import { authenticateToken } from "./middleware/auth";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import  mysql  from "mysql";
+import  mysql  from "mysql2";
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   host: '127.0.0.1',
   user: 'root',
   password: 'root',
   database: 'users'
 });
 
-connection.connect()
-connection.query('create table tab_a(col1 integer)')
-connection.query('insert into tab_a(col1) values(1)')
-connection.query('SELECT * FROM tab_a', (err, rows, fields) => {
-  if (err) throw err
-  console.log('The solution is: ', rows[0]);
-})
+// 非同期使いたいのでasync関数を作成
+const main = async () => {
+  connection.query('drop table tab_a')
+  connection.query('create table tab_a(col1 integer)')
+  connection.query('insert into tab_a(col1) values(1)')
+  //結果を取得したい
+  const [rows] = await connection.promise().query('SELECT * FROM tab_a');
+  console.dir(rows);
+}
+main();
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
