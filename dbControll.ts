@@ -11,12 +11,12 @@ const DB = mysql.createPool({
 
 // テーブル作成
 export const createTable = async () => {
-  DB.query(
-    "create table users(id integer, username varchar(255), password varchar(255))"
-  );
-  //結果を取得したい
-  DB.query("delete from users");
+  DB.query("delete if exists from users");
   DB.query("drop if exists table users");
+
+  DB.query(
+    "create table users(id integer NOT NULL AUTO_INCREMENT, username varchar(255), password varchar(255), PRIMARY KEY (id))"
+  );
 };
 
 // ユーザー情報の取得
