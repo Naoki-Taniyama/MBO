@@ -14,6 +14,7 @@ const testUser = {
     username: "testusername1",
     password: "testpassword1",
 };
+(0, dbControll_1.dropTable)();
 (0, dbControll_1.createTable)();
 console.dir();
 dotenv_1.default.config();
@@ -22,8 +23,6 @@ const app = (0, express_1.default)();
 const port = 3000;
 //ユーザー情報
 const users = [];
-//ユーザーID(作成するたびにインクリメント)
-let currentId = 1;
 app.use(body_parser_1.default.urlencoded({
     extended: true,
 }));
@@ -39,7 +38,7 @@ app.post("/login", (req, res, next) => {
         return;
     }
     if (username === "admin" && password === "admin") {
-        const token = jsonwebtoken_1.default.sign({ username }, SECRET_KEY, { expiresIn: "30m" });
+        const token = jsonwebtoken_1.default.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
         res.json({ token });
     }
     else {
@@ -47,8 +46,9 @@ app.post("/login", (req, res, next) => {
     }
 });
 //ユーザー情報の取得
-app.get("/users", (req, res) => {
-    const users = (0, dbControll_1.getUsers)();
+app.get("/users", async (req, res) => {
+    const users = await (0, dbControll_1.getUsers)();
+    console.log("users=====", users);
     res.json(users);
 });
 //ユーザー情報の登録

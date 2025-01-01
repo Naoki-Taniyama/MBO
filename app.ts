@@ -3,7 +3,7 @@ import { authenticateToken } from "./middleware/auth";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import { createTable, getUsers, insertUser } from "./dbControll";
+import { createTable, dropTable, getUsers, insertUser } from "./dbControll";
 
 const testUser: userType = {
   id: 2,
@@ -11,6 +11,7 @@ const testUser: userType = {
   password: "testpassword1",
 };
 
+dropTable();
 createTable();
 console.dir();
 dotenv.config();
@@ -27,8 +28,6 @@ type userType = {
 
 //ユーザー情報
 const users: userType[] = [];
-//ユーザーID(作成するたびにインクリメント)
-let currentId = 1;
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -48,7 +47,7 @@ app.post("/login", (req: Request, res: Response, next: NextFunction) => {
     return;
   }
   if (username === "admin" && password === "admin") {
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "30m" });
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
     res.json({ token });
   } else {
     res.json({ message: "ユーザーネームかパスワードが違います" });
@@ -56,8 +55,9 @@ app.post("/login", (req: Request, res: Response, next: NextFunction) => {
 });
 
 //ユーザー情報の取得
-app.get("/users", (req, res) => {
-  const users = getUsers();
+app.get("/users", async (req, res) => {
+  const users = await getUsers();
+  console.log("users=====", users);
   res.json(users);
 });
 
@@ -65,7 +65,7 @@ app.get("/users", (req, res) => {
 app.post("/user", authenticateToken, (req, res) => {
   const { username, password } = req.body;
   insertUser(username, password);
-  res.json({message: "ユーザーを登録しました"});
+  res.json({ message: "ユーザーを登録しました" });
 });
 
 //ユーザー情報の削除

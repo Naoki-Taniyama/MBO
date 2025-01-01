@@ -9,11 +9,12 @@ const DB = mysql.createPool({
   namedPlaceholders: true,
 });
 
+// 前回のテーブル情報を削除
+export const dropTable = async () => {
+  DB.query("drop table if exists users");
+};
 // テーブル作成
 export const createTable = async () => {
-  DB.query("delete if exists from users");
-  DB.query("drop if exists table users");
-
   DB.query(
     "create table users(id integer NOT NULL AUTO_INCREMENT, username varchar(255), password varchar(255), PRIMARY KEY (id))"
   );
@@ -21,14 +22,18 @@ export const createTable = async () => {
 
 // ユーザー情報の取得
 export const getUsers = async () => {
-  const [rows] = await DB.promise().query("select * from users");
+  const [rows] = await DB.promise().execute("select * from users");
+  console.dir(rows);
   return rows;
 };
 
 // ユーザー情報の登録
 export const insertUser = async (username: string, password: string) => {
-  await DB.promise().query("insert into users(username, password) values(:username, :password)", {
-    username,
-    password,
-  });
+  await DB.promise().query(
+    "insert into users(username, password) values(:username, :password)",
+    {
+      username,
+      password,
+    }
+  );
 };
