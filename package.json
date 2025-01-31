@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.3.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
@@ -23,6 +24,7 @@
     "@types/mysql": "^2.15.26",
     "@types/node": "^22.10.2",
     "nodemon": "^3.1.9",
+    "prisma": "^6.3.0",
     "ts-node": "^10.9.2"
   }
 }
