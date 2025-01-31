@@ -14,8 +14,8 @@ const testUser = {
     username: "testusername1",
     password: "testpassword1",
 };
-(0, dbControll_1.dropTable)();
-(0, dbControll_1.createTable)();
+// dropTable();
+// createTable();
 console.dir();
 dotenv_1.default.config();
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -58,21 +58,22 @@ app.post("/user", auth_1.authenticateToken, (req, res) => {
     res.json({ message: "ユーザーを登録しました" });
 });
 //ユーザー情報の削除
-app.delete("/user/:id", auth_1.authenticateToken, (req, res) => {
+app.delete("/user/:id", auth_1.authenticateToken, async (req, res) => {
     const userId = Number(req.params.id);
-    //userIdに該当するユーザーのindexを取得
-    const index = users.findIndex((user) => user.id === userId);
-    //バリデーション
-    if (userId === undefined) {
-        res.status(400).json({ error: "idは必須です" });
-        return;
+    try {
+        const affectedRows = await (0, dbControll_1.deleteUser)(userId);
+        console.log("affectedRows=====", affectedRows);
+        if (affectedRows.valueOf() > 0) {
+            res.json({ message: "ユーザーを削除しました" });
+        }
+        else {
+            res.status(404).json({ message: "ユーザーが見つかりません" });
+        }
     }
-    if (index === -1) {
-        res.status(404).json({ error: "ユーザーが存在しません" });
-        return;
+    catch (error) {
+        console.error(error);
+        res.sendStatus(500);
     }
-    users.splice(index, 1);
-    res.json({ message: `ユーザーid${userId}を削除しました` });
 });
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

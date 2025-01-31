@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertUser = exports.getUsers = exports.createTable = exports.dropTable = void 0;
+exports.deleteUser = exports.insertUser = exports.getUsers = exports.createTable = exports.dropTable = void 0;
 const mysql2_1 = __importDefault(require("mysql2"));
 const DB = mysql2_1.default.createPool({
     host: "127.0.0.1",
@@ -38,3 +38,9 @@ const insertUser = async (username, password) => {
     });
 };
 exports.insertUser = insertUser;
+// ユーザー情報の削除
+const deleteUser = async (id) => {
+    const [result] = await DB.promise().query("delete from users where id = :id", { id });
+    return result.affectedRows;
+};
+exports.deleteUser = deleteUser;

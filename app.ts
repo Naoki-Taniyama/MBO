@@ -3,7 +3,7 @@ import { authenticateToken } from "./middleware/auth";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import { createTable, dropTable, getUsers, insertUser } from "./dbControll";
+import { createTable, dropTable, getUsers, insertUser, deleteUser } from "./dbControll";
 
 const testUser: userType = {
   id: 2,
@@ -11,8 +11,8 @@ const testUser: userType = {
   password: "testpassword1",
 };
 
-dropTable();
-createTable();
+// dropTable();
+// createTable();
 console.dir();
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -69,22 +69,20 @@ app.post("/user", authenticateToken, (req, res) => {
 });
 
 //ユーザー情報の削除
-app.delete("/user/:id", authenticateToken, (req, res) => {
+app.delete("/user/:id", authenticateToken, async (req, res) => {
   const userId = Number(req.params.id);
-  //userIdに該当するユーザーのindexを取得
-  const index = users.findIndex((user) => user.id === userId);
-
-  //バリデーション
-  if (userId === undefined) {
-    res.status(400).json({ error: "idは必須です" });
-    return;
+  try {
+    const affectedRows = await deleteUser(userId);
+    console.log("affectedRows=====", affectedRows);
+    if (affectedRows.valueOf() > 0) {
+      res.json({ message: "ユーザーを削除しました" });
+    } else {
+      res.status(404).json({ message: "ユーザーが見つかりません" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
   }
-  if (index === -1) {
-    res.status(404).json({ error: "ユーザーが存在しません" });
-    return;
-  }
-  users.splice(index, 1);
-  res.json({ message: `ユーザーid${userId}を削除しました` });
 });
 
 app.listen(port, () => {

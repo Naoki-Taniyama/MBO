@@ -37,3 +37,9 @@ export const insertUser = async (username: string, password: string) => {
     }
   );
 };
+
+// ユーザー情報の削除
+export const deleteUser = async (id: number): Promise<Number> => {
+  const [result] = await DB.promise().query("delete from users where id = :id", { id });
+  return (result as any).affectedRows;
+};
