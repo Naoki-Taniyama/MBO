@@ -1,4 +1,5 @@
 import mysql from "mysql2";
+import { PrismaClient } from "@prisma/client";
 
 const DB = mysql.createPool({
   host: "127.0.0.1",
@@ -8,6 +9,7 @@ const DB = mysql.createPool({
   connectionLimit: 3,
   namedPlaceholders: true,
 });
+const prisma = new PrismaClient();
 
 // 前回のテーブル情報を削除
 export const dropTable = async () => {
@@ -22,24 +24,22 @@ export const createTable = async () => {
 
 // ユーザー情報の取得
 export const getUsers = async () => {
-  const [rows] = await DB.promise().execute("select * from users");
-  console.dir(rows);
-  return rows;
+  const users = await prisma.user.findMany();
+  return users;
 };
 
 // ユーザー情報の登録
 export const insertUser = async (username: string, password: string) => {
-  await DB.promise().query(
-    "insert into users(username, password) values(:username, :password)",
-    {
-      username,
-      password,
-    }
-  );
+  const user = await prisma.user.create({
+    data: {
+      name: username,
+      password: password,
+    },
+  });
 };
 
 // ユーザー情報の削除
-export const deleteUser = async (id: number): Promise<Number> => {
-  const [result] = await DB.promise().query("delete from users where id = :id", { id });
-  return (result as any).affectedRows;
-};
+export const deleteUser = async (id: number) => {
+  const user = await prisma.user.delete({where: {id: id}});
+  return user;
+}

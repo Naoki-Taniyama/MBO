@@ -56,29 +56,34 @@ app.post("/login", (req: Request, res: Response, next: NextFunction) => {
 
 //ユーザー情報の取得
 app.get("/users", async (req, res) => {
-  const users = await getUsers();
-  console.log("users=====", users);
-  res.json(users);
+  try {
+    const users = await getUsers();
+    // console.log("users=====", users);
+    res.json(users);  
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
 });
 
 //ユーザー情報の登録
 app.post("/user", authenticateToken, (req, res) => {
-  const { username, password } = req.body;
-  insertUser(username, password);
-  res.json({ message: "ユーザーを登録しました" });
+  try {
+    const { username, password } = req.body;
+    insertUser(username, password);
+    res.json({ message: "ユーザーを登録しました" });
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
 });
 
 //ユーザー情報の削除
 app.delete("/user/:id", authenticateToken, async (req, res) => {
   const userId = Number(req.params.id);
   try {
-    const affectedRows = await deleteUser(userId);
-    console.log("affectedRows=====", affectedRows);
-    if (affectedRows.valueOf() > 0) {
-      res.json({ message: "ユーザーを削除しました" });
-    } else {
-      res.status(404).json({ message: "ユーザーが見つかりません" });
-    }
+    const user = await deleteUser(userId);
+    res.json({ message: `ユーザーを削除しました:${JSON.stringify(user)}`});
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
